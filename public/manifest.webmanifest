@@ -1,0 +1,13 @@
+{
+  "name": "Learning OS",
+  "short_name": "Learning OS",
+  "description": "Entender e lembrar — psicologia",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F3EEE4",
+  "theme_color": "#2F4A4A",
+  "lang": "pt",
+  "icons": [
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}
