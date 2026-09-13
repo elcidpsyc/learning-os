@@ -30,7 +30,10 @@ export function ReviewTab() {
   function grade(q: 1 | 2 | 3 | 4) {
     if (!card) return;
     recordAttempt(card.id, draft.trim(), q);
-    const nxt = nextDueCard(useVault.getState().cards, card.id);
+    const nxt = nextDueCard(
+      useVault.getState().cards,
+      card.id,
+    );
     setActiveCard(nxt?.id ?? null);
     setDraft("");
     setSubmitted(false);
