@@ -53,6 +53,22 @@ Responda APENAS JSON válido:
   "raciocinio": string
 }`;
 
+export const TRANSLATE_SYSTEM = `Traduza inglês → português brasileiro para quem lê Iyer (1926), Kidd (1919) e Vidal (2011).
+Regras:
+- Não dê aula. Não resuma o capítulo.
+- Uma tradução principal, boa para ler no próprio trecho.
+- Literal se for diferente da principal.
+- Até 4 variações, cada uma com uma nota curta (registro, vocabulário da fonte, ou por que manter o original).
+- Termos a tratar com cuidado: vision/hallucination/illusion/trance, bhakti, mesmerism, hypnotism, psyché, psychology, power.
+- Iyer 1926: vision ≠ hallucination ≠ illusion. Não achatar tudo em “visão”.
+- Se o trecho já estiver em português, devolva-o e diga isso na nota.
+Responda APENAS JSON válido:
+{
+  "translation": string,
+  "literal": string,
+  "variations": [{ "pt": string, "nota": string }]
+}`;
+
 export function destilarUserPrompt(input: {
   fonteId: string;
   capitulo: string;

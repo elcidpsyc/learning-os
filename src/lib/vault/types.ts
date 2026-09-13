@@ -105,11 +105,22 @@ export type Reasoning = {
 export type ChatTurn = {
   id: string;
   role: "user" | "tutor" | "system";
-  content: string;
   at: string;
+  content: string;
 };
 
 export type StudyMode = "destilador" | "socratico" | "comparador";
+
+export type GlossMark = {
+  id: string;
+  text: string;
+  translation: string;
+  literal?: string;
+  variations: { pt: string; nota: string }[];
+  noteId: string | null;
+  field: string;
+  createdAt: string;
+};
 
 export type VaultData = {
   version: number;
@@ -121,6 +132,7 @@ export type VaultData = {
   profile: Profile;
   sources: Source[];
   reasoning: Reasoning[];
+  marks: GlossMark[];
 };
 
 export const FONTE_LABEL: Record<string, string> = {

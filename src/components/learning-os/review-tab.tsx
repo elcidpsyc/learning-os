@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { AnnotatedText } from "@/components/learning-os/annotated-text";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -30,10 +31,7 @@ export function ReviewTab() {
   function grade(q: 1 | 2 | 3 | 4) {
     if (!card) return;
     recordAttempt(card.id, draft.trim(), q);
-    const nxt = nextDueCard(
-      useVault.getState().cards,
-      card.id,
-    );
+    const nxt = nextDueCard(useVault.getState().cards, card.id);
     setActiveCard(nxt?.id ?? null);
     setDraft("");
     setSubmitted(false);
@@ -63,7 +61,13 @@ export function ReviewTab() {
         <div className="flex flex-col gap-4">
           <div className="rounded-2xl border border-border bg-surface px-4 py-4">
             <p className="text-xs font-medium uppercase tracking-wide text-muted">Gabarito</p>
-            <p className="mt-2 font-body text-base leading-normal">{card.gabarito}</p>
+            <AnnotatedText
+              as="p"
+              className="mt-2 font-body text-base leading-normal"
+              text={card.gabarito}
+              noteId={card.noteIds[0] ?? null}
+              field={`gabarito-${card.id}`}
+            />
           </div>
           <p className="text-sm text-muted">Qualidade desta resposta</p>
           <div className="grid grid-cols-4 gap-2">

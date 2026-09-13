@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import seedJson from "@/data/seed.json";
-import type { Note, Profile, Reasoning, ReviewCard, StudyMode, VaultData } from "./types";
+import type { GlossMark, Note, Profile, Reasoning, ReviewCard, StudyMode, VaultData } from "./types";
 
 const SEED = seedJson as VaultData;
 const STORAGE_KEY = "learning-os-vault-v1";
@@ -24,6 +24,8 @@ type VaultState = VaultData & {
   patchProfile: (patch: Partial<Profile>) => void;
   attachNoteToMap: (nodeId: string, noteId: string) => void;
   markSourceChapter: (fonteId: string, capitulo: string) => void;
+  addMark: (mark: Omit<GlossMark, "id" | "createdAt">) => void;
+  removeMark: (id: string) => void;
   replaceVault: (data: VaultData) => void;
   restoreSeed: () => void;
   exportVault: () => VaultData;
@@ -39,8 +41,12 @@ function addDays(days: number): string {
   return d.toISOString().slice(0, 10);
 }
 
+function withMarks(data: VaultData): VaultData {
+  return { ...data, marks: Array.isArray(data.marks) ? data.marks : [] };
+}
+
 function cloneSeed(): VaultData {
-  return structuredClone(SEED);
+  return withMarks(structuredClone(SEED));
 }
 
 function snapshot(s: VaultState): VaultData {
@@ -54,6 +60,7 @@ function snapshot(s: VaultState): VaultData {
     profile: s.profile,
     sources: s.sources,
     reasoning: s.reasoning,
+    marks: s.marks ?? [],
   };
 }
 
@@ -73,7 +80,7 @@ function readVault(): VaultData | null {
     if (!raw) return null;
     const parsed = JSON.parse(raw) as VaultData;
     if (!Array.isArray(parsed.notes) || !Array.isArray(parsed.cards)) return null;
-    return parsed;
+    return withMarks(parsed);
   } catch {
     return null;
   }
@@ -175,16 +182,40 @@ export const useVault = create<VaultState>((set, get) => ({
     }));
     writeVault(snapshot(get()));
   },
+  addMark: (mark) => {
+    set((s) => {
+      const rest = (s.marks ?? []).filter(
+        (m) =>
+          !(
+            m.text.toLowerCase() === mark.text.toLowerCase() &&
+            m.field === mark.field &&
+            (m.noteId ?? null) === (mark.noteId ?? null)
+          ),
+      );
+      const next: GlossMark = {
+        ...mark,
+        id: `mark-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+        createdAt: new Date().toISOString(),
+      };
+      return { marks: [next, ...rest] };
+    });
+    writeVault(snapshot(get()));
+  },
+  removeMark: (id) => {
+    set((s) => ({ marks: (s.marks ?? []).filter((m) => m.id !== id) }));
+    writeVault(snapshot(get()));
+  },
   replaceVault: (data) => {
+    const next = withMarks(data);
     set({
-      ...data,
+      ...next,
       tab: get().tab,
       mode: get().mode,
       hydrated: true,
-      selectedNoteId: data.notes[0]?.id ?? null,
-      activeCardId: data.cards[0]?.id ?? null,
+      selectedNoteId: next.notes[0]?.id ?? null,
+      activeCardId: next.cards[0]?.id ?? null,
     });
-    writeVault(data);
+    writeVault(next);
   },
   restoreSeed: () => {
     const seed = cloneSeed();
@@ -207,6 +238,7 @@ export function hydrateVault(): void {
   if (!saved) return;
   useVault.setState({
     ...saved,
+    marks: saved.marks ?? [],
     hydrated: true,
     activeCardId: saved.cards[0]?.id ?? null,
   });

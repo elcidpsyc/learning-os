@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { AnnotatedText } from "@/components/learning-os/annotated-text";
 import { useVault } from "@/lib/vault/store";
 import { FONTE_LABEL } from "@/lib/vault/types";
 import { cn } from "@/lib/utils";
@@ -7,6 +8,8 @@ export function NotesTab() {
   const notes = useVault((s) => s.notes);
   const selectedNoteId = useVault((s) => s.selectedNoteId);
   const selectNote = useVault((s) => s.selectNote);
+  const marks = useVault((s) => s.marks);
+  const markCount = marks.filter((m) => m.noteId === selectedNoteId).length;
   const selected = notes.find((n) => n.id === selectedNoteId) ?? notes[0];
 
   if (!notes.length) {
@@ -27,38 +30,61 @@ export function NotesTab() {
           {FONTE_LABEL[selected.fonte]} · {selected.capitulo} · p. {selected.paginas}
         </p>
         <h2 className="font-display text-2xl font-medium tracking-tight">{selected.title}</h2>
+        <p className="text-sm text-muted">
+          Selecione uma palavra ou frase em inglês para ver a tradução no local.
+          {markCount ? ` ${markCount} marca${markCount > 1 ? "s" : ""} nesta nota.` : ""}
+        </p>
         <Section title="Claim da fonte">
           <ul className="flex flex-col gap-2">
-            {selected.claims.map((c) => (
-              <li key={c} className="font-body text-base leading-normal">
-                {c}
-              </li>
+            {selected.claims.map((c, i) => (
+              <AnnotatedText
+                key={`${selected.id}-c-${i}`}
+                as="li"
+                className="font-body text-base leading-normal"
+                text={c}
+                noteId={selected.id}
+                field={`claims-${i}`}
+              />
             ))}
           </ul>
         </Section>
         {selected.quote ? (
           <Section title="Palavras do autor">
-            <blockquote className="border-l-2 border-primary/40 pl-4 font-body text-base italic leading-normal text-fg">
-              {selected.quote.text}
-            </blockquote>
+            <AnnotatedText
+              as="blockquote"
+              className="border-l-2 border-primary/40 pl-4 font-body text-base italic leading-normal text-fg"
+              text={selected.quote.text}
+              noteId={selected.id}
+              field="quote"
+            />
           </Section>
         ) : null}
         <Section title="Comentário nosso">
           <ul className="flex flex-col gap-2">
-            {selected.comentario.map((c) => (
-              <li key={c} className="text-base leading-normal text-muted">
-                {c}
-              </li>
+            {selected.comentario.map((c, i) => (
+              <AnnotatedText
+                key={`${selected.id}-n-${i}`}
+                as="li"
+                className="text-base leading-normal text-muted"
+                text={c}
+                noteId={selected.id}
+                field={`comentario-${i}`}
+              />
             ))}
           </ul>
         </Section>
         {selected.perguntasAbertas.length ? (
           <Section title="Perguntas em aberto">
             <ol className="flex list-decimal flex-col gap-2 pl-4">
-              {selected.perguntasAbertas.map((q) => (
-                <li key={q} className="text-base leading-normal">
-                  {q}
-                </li>
+              {selected.perguntasAbertas.map((q, i) => (
+                <AnnotatedText
+                  key={`${selected.id}-q-${i}`}
+                  as="li"
+                  className="text-base leading-normal"
+                  text={q}
+                  noteId={selected.id}
+                  field={`pergunta-${i}`}
+                />
               ))}
             </ol>
           </Section>

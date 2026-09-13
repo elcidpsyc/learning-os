@@ -9,6 +9,7 @@ import { NotesTab } from "./notes-tab";
 import { ReviewTab } from "./review-tab";
 import { MapTab } from "./map-tab";
 import { SourcesTab } from "./sources-tab";
+import { TranslatorPopup } from "./translator-popup";
 
 const TABS: { id: TabId; label: string; icon: typeof BookOpen }[] = [
   { id: "estudar", label: "Estudar", icon: BookOpen },
@@ -89,6 +90,7 @@ export function LearningOS() {
           })}
         </ul>
       </nav>
+      <TranslatorPopup />
       <Toaster position="top-center" richColors />
     </div>
   );

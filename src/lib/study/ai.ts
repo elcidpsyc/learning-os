@@ -27,6 +27,12 @@ type CompararResult = {
   raciocinio: string;
 };
 
+type TraduzirResult = {
+  translation: string;
+  literal: string;
+  variations: { pt: string; nota: string }[];
+};
+
 export async function getAiStatus(): Promise<{ available: boolean }> {
   return { available: false };
 }
@@ -46,5 +52,11 @@ export async function tutorSocratico(_input: { data: unknown }): Promise<
 export async function compararFontes(_input: { data: unknown }): Promise<
   { ok: false; error: string } | { ok: true; data: CompararResult }
 > {
+  return { ok: false, error: "AI is not available" };
+}
+
+export async function traduzirTrecho(_input: {
+  data: { text: string; context: string };
+}): Promise<{ ok: false; error: string } | { ok: true; data: TraduzirResult }> {
   return { ok: false, error: "AI is not available" };
 }
